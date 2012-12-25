@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script src="javascripts/Markdown.Converter.js"></script>
+    <script src="javascripts/jquery.twitterbutton.js"></script>
     <script src="javascripts/main.js"></script>
     <!--[if lt IE 9]>
       <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -17,13 +17,30 @@
 			.gist-meta {
 				display: none;
 			}
+			#twitterButton > div {
+				display: inline-block;
+				position: relative;
+				top: 10px;
+			}
+			@media all and (max-width: 720px) {
+			  #twitterButton {
+					position: absolute;
+					top: 10px;
+					left: 10px;
+				}
+				header p {
+					display: block;
+				}
+			}
 		</style>
   </head>
   <body>
 
       <header>
         <h1>jQuery.ajax.fake</h1>
-        <p></p>
+        <p>
+        	<a href="#" id="twitterButton"></a>
+        </p>
       </header>
 
       <div id="banner">
@@ -46,8 +63,25 @@
       <section>
         <script src="https://gist.github.com/4375063.js"></script>
         <script>
-        	// a small hack to prevent gist styles
-        	$('section > link').prop('disabled', true);
+					(function($) {
+						$(function() {
+							
+		        	// a small hack to prevent gist styles
+		        	$('section > link').prop('disabled', true);
+		        	
+		        	// tweet message
+							var message = 'Faking jQuery ajax calls has never been this easy!';
+							
+							// tweet button
+							$('#twitterButton').twitterbutton({
+							  	user:'anasnakawa',
+							  	layout:'horizontal',
+							  	title:message,
+							  	lang:'en'
+							 });
+							
+						});
+					})(jQuery);
         </script>
       </section>
       <footer>
