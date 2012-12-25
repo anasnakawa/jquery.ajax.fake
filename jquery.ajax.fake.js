@@ -1,20 +1,13 @@
-// ------------------------------
-// jquery.ajax.fake.js
-// http://anasnakawa.github.com/jquery.ajax.fake
+/*!------------------------------
+ * jquery.ajax.fake.js
+ * http://anasnakawa.github.com/jquery.ajax.fake
+ * license: MIT (http://opensource.org/licenses/mit-license.php)
+ * ------------------------------
+ */
 // ------------------------------
 // author : Anas Nakawa
 //			anas.nakawa@gmail.com
 //			@anasnakawa
-// license: MIT (http://opensource.org/licenses/mit-license.php)
-// ------------------------------
-
-// ------------------------------
-// table of content
-// ------------------------------
-// some title
-//  - sub title
-//  - sub title 2
-// some mixin
 // ------------------------------
 
 (function($){
@@ -24,8 +17,8 @@
 	, fakeWebServices = {}
 	, deferred = $.Deferred()
 	, defaults = {
-		fake		: false
-		, randomFail: 0			// (number between 0 to 1) should the fake ajax randomly fail ? 
+		fake	: false	// is it fake ?
+		, wait	: 1000	// how long should wait before return ajax response 
 	}
 	
 	, ajaxFake = function(options) {
@@ -35,6 +28,8 @@
 		if(!fake) {
 			return ajax.apply(this, arguments);
 		}
+		
+		options = $.extend(defaults, options);
 		
 		if( !fakeWebServices[options.url] ) {
 			// options.error( deferred.reject() );
@@ -50,10 +45,13 @@
 			}
 			deferred.resolve( data )
 			
-		}, 1000);
+		}, options.wait);
+		
+		// deferred ajax aliasing
+		deferred.success = deferred.done;
+		deferred.error = deferred.fail;
 		
 		return deferred;
-		
 	}
 	
 	, registerFakeWebService = function(url, callback) {
@@ -70,6 +68,5 @@
 		, registerWebservice	: registerFakeWebService
 		, webServices			: fakeWebServices
 	};
-	
 
 })(jQuery);

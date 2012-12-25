@@ -30,19 +30,19 @@
         <script src="webservices.fake.js"></script>
 
         <script>
-        		$.ajax.isFake = false;
+        		// $.ajax.isFake = false;
             $.ajax({
 				        type:'GET',
 				        dataType:'jsonp',
 				        fake: true,
 				        url:'http://api.twitter.com/1/statuses/user_timeline.json?screen_name=anasnakawa&count=2',
-				        successes:function(data, textStatus, XMLHttpRequest) {
+				        successss:function(data, textStatus, XMLHttpRequest) {
 				        		$('.buffer').html( data[0].text );
 				        },
 				        error:function(req, status, error) {
 				            console.error('error: '+status);
 				        }
-				    }).done(function(data) {
+				    }).success(function(data) {
 				    	$('.buffer').html( data[0].text + ' "promise one"' )
 				    });
         </script>
