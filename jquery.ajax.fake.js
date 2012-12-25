@@ -28,20 +28,8 @@
 		, randomFail: 0			// (number between 0 to 1) should the fake ajax randomly fail ? 
 	}
 	
-	/*\
-	 * 
-	 * var deferred = $.Deferred();
-
-		deferred.done(function(value) {
-   			alert(value);
-		});
-
-		deferred.resolve("hello world");
-	 */
-	
 	, ajaxFake = function(options) {
 		
-		// debugger;
 		// not fake, just return the original jquery ajax
 		var fake = !$.ajax.isFake ? false : options.fake;
 		if(!fake) {
