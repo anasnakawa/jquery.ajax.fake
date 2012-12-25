@@ -51,3 +51,7 @@ fixScale = function(doc) {
     doc[addEvent](type, fix, true);
   }
 };
+
+$.get('https://gist.github.com/raw/4375063/fb1d81fd706bf52febecc77889baa1f5af8cd6de/jquery.ajax.fake.md', function(data) {
+	console.log(data);
+});
