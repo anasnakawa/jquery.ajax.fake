@@ -24,15 +24,17 @@
 	, ajaxFake = function(options) {
 		
 		// not fake, just return the original jquery ajax
-		var fake = !$.ajax.isFake ? false : options.fake;
-		if(!fake) {
-			return ajax.apply(this, arguments);
+		if( $.ajax.isFake === false ) {
+		  return ajax.apply(this, arguments);
+		}
+		
+		if( !options.fake ) {
+		  return ajax.apply(this, arguments);
 		}
 		
 		options = $.extend(defaults, options);
 		
 		if( !fakeWebServices[options.url] ) {
-			// options.error( deferred.reject() );
 			$.error('{url} 404 not found'.replace(/{url}/, options.url));
 			return deferred.reject('404');
 		}
@@ -43,15 +45,15 @@
 			if(options.success) {
 				options.success( data );
 			}
-			deferred.resolve( data )
+			if(options.complete) {
+			  options.complete( data );
+			}
+			deferred.resolve( data );
 			
 		}, options.wait);
 		
-		// deferred ajax aliasing
-		deferred.success = deferred.done;
-		deferred.error = deferred.fail;
-		
-		return deferred;
+		// return a promise object
+		return deferred.promise();
 	}
 	
 	, registerFakeWebService = function(url, callback) {
@@ -64,9 +66,9 @@
 	// --------------------
 	$.ajax = ajaxFake;
 	$.ajax.fake = {
-		defaults				: defaults
+		defaults				      : defaults
 		, registerWebservice	: registerFakeWebService
-		, webServices			: fakeWebServices
+		, webServices			    : fakeWebServices
 	};
 
 })(jQuery);
