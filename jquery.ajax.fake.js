@@ -68,7 +68,7 @@
   $.ajax.fake = {
     defaults              : defaults
     , registerWebservice  : registerFakeWebService
-    , webServices          : fakeWebServices
+    , webServices         : fakeWebServices
   };
 
 })(jQuery);
