@@ -77,7 +77,6 @@ wait	: 1000	// how long should wait before return ajax response
 
 ## Todo
 * failed requests
-* provide some test cases
 
 ## Credits
 created by Anas Nakawa [github](//github.com/anasnakawa), [twitter](//twitter.com/anasnakawa),  
