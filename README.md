@@ -3,8 +3,6 @@ when you want to fake an ajax call, that's because your server's web service is 
 
 with `jquery.ajax.fake` you simply write pure jQuery ajax call, with only one extra property `fake: true`
 
-## Why
-
 ## How to use it
 include `jquery.ajax.fake.js` script into your markup, and create `webservices.fake.js` to handle fake ajax calls
 ```html
@@ -52,9 +50,9 @@ var deferred = $.ajax({
     url:'http://api.twitter.com/1/statuses/user_timeline.json?screen_name=anasnakawa'
 });
 
-deferred.success(function(data) {
+deferred.done(function(data) {
 	// your fake tweet should be here!
-}).error(function() {
+}).fail(function() {
     // handle some errors
 });
 ```
