@@ -15,13 +15,15 @@
   // caching original jquery ajax method
   var ajax = $.ajax
   , fakeWebServices = {}
-  , deferred = $.Deferred()
   , defaults = {
     fake  : false  // is it fake ?
     , wait  : 1000  // how long should wait before return ajax response 
   }
   
   , ajaxFake = function(options) {
+
+    // Create a new deferred object for each request
+    var deferred = $.Deferred();
     
     // not fake, just return the original jquery ajax
     if( $.ajax.isFake === false ) {
