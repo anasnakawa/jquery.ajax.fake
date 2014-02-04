@@ -35,15 +35,20 @@
     }
     
     options = $.extend(defaults, options);
-    
-    if( !fakeWebServices[options.url] ) {
+    if (!options.type) {
+      options.type = 'get';
+    } else {
+      options.type = options.type.toLowerCase()
+    }
+
+    if( !fakeWebServices[options.url][options.type] ) {
       $.error('{url} 404 not found'.replace(/{url}/, options.url));
       return deferred.reject('404');
     }
 
     // fake it..
     setTimeout(function() {
-      var data = fakeWebServices[options.url](options.data);
+      var data = fakeWebServices[options.url][options.type](options.data);
       if(options.success) {
         options.success( data );
       }
@@ -58,8 +63,14 @@
     return deferred.promise();
   }
   
-  , registerFakeWebService = function(url, callback) {
-    fakeWebServices[url] = function(data) {
+  , registerFakeWebService = function(url, callback, requestType) {
+    if (!requestType) {
+      requestType = 'get'
+    }
+    if (!fakeWebServices[url]) {
+      fakeWebServices[url] = {}
+    }
+    fakeWebServices[url][requestType] = function(data) {
       return callback(data);
     }
   }
