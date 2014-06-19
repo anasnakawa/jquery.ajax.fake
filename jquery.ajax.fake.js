@@ -34,7 +34,7 @@
       return ajax.apply(this, arguments);
     }
     
-    options = $.extend(defaults, options);
+    options = $.extend({}, defaults, options);
     
     if( !fakeWebServices[options.url] ) {
       $.error('{url} 404 not found'.replace(/{url}/, options.url));
