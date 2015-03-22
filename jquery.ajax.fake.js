@@ -45,10 +45,18 @@
     setTimeout(function() {
       var data = fakeWebServices[options.url](options.data);
       if(options.success) {
-        options.success( data );
+        if(options.context) {
+          $.proxy(options.success, options.context)( data );
+        } else {
+          options.success( data );
+        }
       }
       if(options.complete) {
-        options.complete( data );
+        if(options.context) {
+          $.proxy(options.complete, options.context)( data );
+        } else {
+          options.complete( data );
+        }
       }
       deferred.resolve( data );
       
