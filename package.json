@@ -1,0 +1,5 @@
+{
+  "main": "./jquery.ajax.fake.js",
+  "name": "jquery.ajax.fake",
+  "version": "0.5.2"
+}
