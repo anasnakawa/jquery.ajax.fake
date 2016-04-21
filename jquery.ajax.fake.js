@@ -2,55 +2,34 @@
  * jquery.ajax.fake.js
  * http://anasnakawa.github.com/jquery.ajax.fake
  * license: MIT (http://opensource.org/licenses/mit-license.php)
+ * author : Anas Nakawa anas.nakawa@gmail.com @anasnakawa
  * ------------------------------
+ *
+ * Custom version
+ * author: Roger (rogerio.taques@gmail.com)
  */
-// ------------------------------
-// author : Anas Nakawa
-//      anas.nakawa@gmail.com
-//      @anasnakawa
-// ------------------------------
 
 (function($){
 
-  // caching original jquery ajax method
-  var ajax = $.ajax
-  , fakeWebServices = {}
-  , defaults = {
-    fake  : false  // is it fake ?
-    , wait  : 1000  // how long should wait before return ajax response 
-  }
-  
-  , ajaxFake = function(options) {
 
-    // Create a new deferred object for each request
-    var deferred = $.Deferred();
-    
-    // not fake, just return the original jquery ajax
-    if( $.ajax.isFake === false ) {
-      return ajax.apply(this, arguments);
-    }
-    
-    if( !options.fake ) {
-      return ajax.apply(this, arguments);
-    }
-    
-    options = $.extend({}, defaults, options);
-    
-    if( !fakeWebServices[options.url] ) {
-      $.error('{url} 404 not found'.replace(/{url}/, options.url));
-      return deferred.reject('404');
-    }
+  var
 
-    // fake it..
-    setTimeout(function() {
-      var data = fakeWebServices[options.url](options.data);
-      if(options.success) {
-        if(options.context) {
-          $.proxy(options.success, options.context)( data );
-        } else {
-          options.success( data );
-        }
-      }
+    // caching original jquery ajax method
+    ajax = $.ajax,
+
+    // defined the fake webservices
+    fakeWebServices = {},
+
+    // complementary properties
+    defaults = {
+      fake  : false,  // is it fake ?
+      wait  : 1000  // how long should wait before return ajax response
+    },
+
+    // whenever complete callback is defined on ajax properties
+    // this method is called.
+    runComplete = function ( options, data ) {
+
       if(options.complete) {
         if(options.context) {
           $.proxy(options.complete, options.context)( data );
@@ -58,27 +37,145 @@
           options.complete( data );
         }
       }
-      deferred.resolve( data );
-      
-    }, options.wait);
-    
-    // return a promise object
-    return deferred.promise();
-  }
-  
-  , registerFakeWebService = function(url, callback) {
-    fakeWebServices[url] = function(data) {
-      return callback(data);
-    }
-  }
-  
-  // expose to jquery api
-  // --------------------
-  $.ajax = ajaxFake;
-  $.ajax.fake = {
-    defaults              : defaults
-    , registerWebservice  : registerFakeWebService
-    , webServices         : fakeWebServices
-  };
+
+    },
+
+    // here goes the magic ...
+    ajaxFake = function(options) {
+
+      // create a new deferred object for each request
+      var deferred = $.Deferred();
+
+      // if global setting is false
+      // not fake, just return the original jquery ajax
+      if ( $.ajax.isFake === false ) {
+        return ajax.apply(this, arguments);
+      }
+
+      // if not fake is defined by aja property
+      // not fake, just return the original jquery ajax
+      if ( !options.fake ) {
+        return ajax.apply(this, arguments);
+      }
+
+      // if type isn't defined, assume it's get.
+      if ( !options.type ) {
+        options.type = 'get';
+      } else {
+        options.type = options.type.toLowerCase();
+      }
+
+      // extend ajax options
+      options = $.extend({}, defaults, options);
+
+      // isn't webservices registered and request type valid?
+      if( !fakeWebServices[options.url] || !fakeWebServices[options.url][options.type] ) {
+
+        // is webservers missing?
+        if ( !fakeWebServices[options.url] ) {
+          $.error('{url} 404 not found'.replace(/{url}/, options.url));
+          return deferred.reject('404');
+        }
+
+        // or is request type wrong?
+        else if( !fakeWebServices[options.url][options.type] ) {
+          $.error(
+            'Method {type} is not allowed for {url}'
+              .replace(/{url}/, options.url)
+              .replace(/{type}/, options.type.toUpperCase())
+            );
+
+          return deferred.reject('405');
+        }
+
+      }
+
+      // fakes timeout error ...
+      if (options.timeout !== undefined && options.timeout < options.wait) {
+
+        setTimeout(function () {
+          var data = fakeWebServices[options.url][options.type](options.data);
+
+          $.error('{url} 408 timeout'.replace(/{url}/, options.url));
+
+          if (options.error) {
+            if (options.context) {
+              $.proxy(options.error, options.context)( data.type.error, 'timeout' );
+            } else {
+              options.error( data.type.error, 'timeout' );
+            }
+          }
+
+          // call complete callback from jquery
+          runComplete(options, data.type.error);
+          return deferred.reject('408');
+
+        }, options.timeout);
+
+        return false;
+      }
+
+      // fake it..
+      setTimeout(function() {
+        var data = fakeWebServices[options.url][options.type](options.data);
+
+        if (options[data.status]) {
+          if(options.context) {
+            $.proxy(options[data.status], options.context)( data.type[data.status] );
+          } else {
+
+            options[data.status]( data.type[data.status], data.status );
+
+          }
+        }
+
+        // call complete callback from jquery
+        runComplete(options, data.type[data.status]);
+
+        // return the promise object according to status
+        switch (data.status) {
+          case 'success':
+            deferred.resolve( data.type.success );
+            break;
+
+          default:
+            deferred.reject({});
+        }
+      }, options.wait);
+
+      // return a promise object
+      return deferred.promise();
+    },
+
+    // method to register fake webservices
+    registerFakeWebService = function(url, callback, requestType, status) {
+      if (!requestType) {
+        requestType = 'get';
+      }
+
+      if (!status) {
+        status = 'success';
+      }
+
+      if (!fakeWebServices[url]) {
+        fakeWebServices[url] = {};
+      }
+
+      fakeWebServices[url][requestType.toLowerCase()] = function(data) {
+        return {
+          type: callback(data),
+          status: status
+        };
+      };
+    };
+
+    // expose to jquery api
+    // --------------------
+    $.ajax = ajaxFake;
+    $.ajax.fake = {
+      defaults            : defaults,
+      registerWebservice  : registerFakeWebService,
+      webServices         : fakeWebServices
+    };
 
 })(jQuery);
