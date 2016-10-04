@@ -7,7 +7,7 @@
  *
  * Custom version for Rakuten
  * @author: Roger (rogerio.taques@rakuten.com)
- * @version 0.3
+ * @version 0.2
  */
 
 (function($){
@@ -173,6 +173,6 @@
       webServices         : fakeWebServices
     };
 
-  console.log('Fake ajax calls was initialised');
+  // console.log('Fake ajax calls was initialised');
 
 })(jQuery);

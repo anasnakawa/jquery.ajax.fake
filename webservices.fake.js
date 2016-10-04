@@ -5,7 +5,6 @@
  * author : Anas Nakawa anas.nakawa@gmail.com @anasnakawa
  * ------------------------------
  */
-
 ;(function($) {
 
   var fake = $.ajax.fake;
@@ -49,6 +48,6 @@
     };
 
     return response;
-  }, 'post' /* http method */, 'success' /* response status */);
+  }, 'post', dummyStatus);
 
 })(jQuery);

@@ -1,83 +1,63 @@
-## jQuery.ajax.fake
-when you want to fake an ajax call, that's because your server's web service is just not ready yet, and whenever that web service is ready, switching back to it should cost nothing..
+# jQuery Ajax Fake
 
-with `jquery.ajax.fake` you simply write pure jQuery ajax call, with only one extra property `fake: true`
+Allow fake ajax calls to simulate it whenever you can't do it for real, on development environments.
 
-## How to use it
-include `jquery.ajax.fake.js` script into your markup, and create `webservices.fake.js` to handle fake ajax calls
+This library was customized and it's original source was created by *Anas Nakawa* and is available at http://anasnakawa.github.com/jquery.ajax.fake.
+
+## Files structure
+
+```bash
+/ (root)
+- dummy.js
+- jquery.ajax.fake.js
+- webservices.fake.js
+```
+
+## Getting started
+
+First include these files into your pages
+
 ```html
-<script src="jquery.ajax.fake.js"></script>
-<script src="webservices.fake.js"></script>
-```
-now lets say you want to fake a twitter timeline ajax call,  
-first simply create a fake web service in `webservices.fake.js` using the same url that you would use in your ajax call as a first parameter
-
-```js
-$.ajax.fake.registerWebservice('http://api.twitter.com/1/statuses/user_timeline.json?screen_name=anasnakawa', function(data) {
-    return [{
-        "text": "hey this is fake #tweet, retweet please :) #retweet"
-    }]
-});
+<body >
+  ...
+  <script type="text/javascript" src="path/to/jquery.js" defer ></script>
+  <script type="text/javascript" src="dummy.js" defer ></script>
+  <script type="text/javascript" src="jquery.ajax.fake.js" defer ></script>
+  <script type="text/javascript" src="webservices.fake.js" defer ></script>
+</body>
 ```
 
-now all you have to do is to add the property `fake: true` to your ajax call settings... and that's it!
-```js
-$.ajax({
-    type:'GET',
-    dataType:'jsonp',
-    fake: true,	// <<<---- that's it !
-    url:'http://api.twitter.com/1/statuses/user_timeline.json?screen_name=anasnakawa',
-    success:function(data, textStatus, XMLHttpRequest) {
-    	// your fake tweet should be here!
+Edit `webservices.fake.js` and define what should be the responses your webservices will return.
+
+
+```javascript
+fake.registerWebservice('some/path/here', function( data ) {
+  var response = {
+    "success": {
+      "propOne": "valueOne",
+      "propTwo": 5,
+      "...": "..."
+    },
+    "error": {
+      "status": 500,
+      "responseText": "{\"error\": \"server_error\", \"message\": \"This is the error message\"}"
     }
-});
+  };
+
+  return response;
+}, 'post', 'success');
 ```
 
-## Disabling fake ajax calls globally
-you can disable fake ajax calls globally by either remove both `jquery.ajax.fake.js` & `webservices.fake.js` script files from your markup, 
-or by just adding the following variable
-```js
-$.ajax.isFake = false;    // this will disable all fake ajax calls, and make the actual jQuery ajax handler work instead
+Then, to make things simple, you can define some key variables in dummy.js (or even inline, but not advised) which you can change whenever you need to test your calls for success or error.
+
+```javascript
+// defines the response status
+var dummyStatus = 'success';
+
+// defines whenever ajax will fake or not your calls
+var dummyAjax  = true;
+
+// pretends a delay on the response 
+var dummyDelay = 650; // 0.65 second;
+
 ```
-
-## What about promises ?
-don't worry, even fake ajax calls will work perfectly with `Deferred` objects that implements the `Promise` interface, as expected a fake ajax call will return a deferred object that will have a success & fail
-```js
-var deferred = $.ajax({
-    type:'GET',
-    dataType:'jsonp',
-    fake: true,       // <<<---- that's it !
-    url:'http://api.twitter.com/1/statuses/user_timeline.json?screen_name=anasnakawa'
-});
-
-deferred.done(function(data) {
-	// your fake tweet should be here!
-}).fail(function() {
-    // handle some errors
-});
-```
-
-## Installing via Bower
-```
-bower install jquery.ajax.fake
-```
-
-## Installing via Yeoman
-```
-yeoman install jquery.ajax.fake
-```
-
-## Reference
-```js
-fake    : false // is it fake ?
-wait	: 1000	// how long should wait before return ajax response
-```
-
-## Todo
-* failed requests
-
-## Credits
-created by Anas Nakawa [github](//github.com/anasnakawa), [twitter](//twitter.com/anasnakawa),  
-
-## License
-Released under the [MIT License](http://www.opensource.org/licenses/mit-license.php)
