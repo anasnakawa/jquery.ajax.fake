@@ -5,30 +5,26 @@
  * author : Anas Nakawa anas.nakawa@gmail.com @anasnakawa
  * ------------------------------
  *
- * Custom version
- * author: Roger (rogerio.taques@gmail.com)
+ * Custom version for Rakuten
+ * @author: Roger (rogerio.taques@rakuten.com)
+ * @version 0.3
  */
 
 (function($){
 
-
+  // caching original jquery ajax method
   var
 
-    // caching original jquery ajax method
     ajax = $.ajax,
 
-    // defined the fake webservices
     fakeWebServices = {},
 
-    // complementary properties
     defaults = {
       fake  : false,  // is it fake ?
       wait  : 1000  // how long should wait before return ajax response
     },
 
-    // whenever complete callback is defined on ajax properties
-    // this method is called.
-    runComplete = function ( options, data ) {
+    _runComplete = function ( options, data ) {
 
       if(options.complete) {
         if(options.context) {
@@ -40,33 +36,29 @@
 
     },
 
-    // here goes the magic ...
     ajaxFake = function(options) {
-
-      // create a new deferred object for each request
+      // Create a new deferred object for each request
       var deferred = $.Deferred();
 
-      // if global setting is false
       // not fake, just return the original jquery ajax
       if ( $.ajax.isFake === false ) {
         return ajax.apply(this, arguments);
       }
 
-      // if not fake is defined by aja property
-      // not fake, just return the original jquery ajax
       if ( !options.fake ) {
         return ajax.apply(this, arguments);
       }
 
-      // if type isn't defined, assume it's get.
       if ( !options.type ) {
         options.type = 'get';
       } else {
         options.type = options.type.toLowerCase();
       }
 
-      // extend ajax options
       options = $.extend({}, defaults, options);
+
+      console.info('Ajax Fake: ', options.url);
+      console.log('Ajax Fake Data: ', options.data);
 
       // isn't webservices registered and request type valid?
       if( !fakeWebServices[options.url] || !fakeWebServices[options.url][options.type] ) {
@@ -107,7 +99,7 @@
           }
 
           // call complete callback from jquery
-          runComplete(options, data.type.error);
+          _runComplete(options, data.type.error);
           return deferred.reject('408');
 
         }, options.timeout);
@@ -130,12 +122,16 @@
         }
 
         // call complete callback from jquery
-        runComplete(options, data.type[data.status]);
+        _runComplete(options, data.type[data.status]);
 
         // return the promise object according to status
         switch (data.status) {
           case 'success':
             deferred.resolve( data.type.success );
+            break;
+
+          case 'error':
+            deferred.reject( data.type.error );
             break;
 
           default:
@@ -147,7 +143,6 @@
       return deferred.promise();
     },
 
-    // method to register fake webservices
     registerFakeWebService = function(url, callback, requestType, status) {
       if (!requestType) {
         requestType = 'get';
@@ -177,5 +172,7 @@
       registerWebservice  : registerFakeWebService,
       webServices         : fakeWebServices
     };
+
+  console.log('Fake ajax calls was initialised');
 
 })(jQuery);
