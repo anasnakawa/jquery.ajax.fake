@@ -1,20 +1,53 @@
-(function($) {
-  
+/*!------------------------------
+ * webservice.fake.js
+ * http://anasnakawa.github.com/jquery.ajax.fake
+ * license: MIT (http://opensource.org/licenses/mit-license.php)
+ * author : Anas Nakawa anas.nakawa@gmail.com @anasnakawa
+ * ------------------------------
+ */
+;(function($) {
+
   var fake = $.ajax.fake;
-  
-  fake.registerWebservice('http://www.twitter.com/userfeeds', function(data) {
-    return {
-      username: 'AnasNakawa'
-      , url:  'http://anasnakawa.wordpress.com'
+
+  // @use registerWebservice(path, callback [, method [, responseStatus]])
+  // @param {string} path             - Path to the webservice
+  // @param {function} callback       - A callback containing the return object with two states (success and error).
+  // @param {string} [method]         - Optional. Request method.
+  // @param {string} [responseStatus] - Optional. What response will be returned (success, error).
+
+
+  // using default request type (get) and response status (success)
+  fake.registerWebservice('some/path/here', function( data ) {
+    var response = {
+      "success": {
+        "propOne": "valueOne",
+        "propTwo": 5,
+        "...": "..."
+      },
+      "error": {
+        "status": 500,
+        "responseText": "{\"error\": \"server_error\", \"message\": \"This is the error messaage\"}"
+      }
     };
+
+    return response;
   });
-  
-  fake.registerWebservice('http://api.twitter.com/1/statuses/user_timeline.json?screen_name=anasnakawa&count=2', function(data) {
-    return [
-          {
-              "text": "hey this is fake #tweet, retweet please :) #retweet"
-          }
-      ]
-  });
-  
+
+  // force request type to 'post' and response status to what is set on dummy.js
+  fake.registerWebservice('some/path/here', function( data ) {
+    var response = {
+      "success": {
+        "propOne": "valueOne",
+        "propTwo": 5,
+        "...": "..."
+      },
+      "error": {
+        "status": 500,
+        "responseText": "{\"error\": \"server_error\", \"message\": \"This is the error messaage\"}"
+      }
+    };
+
+    return response;
+  }, 'post', dummyStatus);
+
 })(jQuery);
