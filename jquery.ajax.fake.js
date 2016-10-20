@@ -53,8 +53,11 @@
 
       options = $.extend({}, defaults, options);
 
-      console.info('Ajax Fake: ', options.url);
-      console.log('Ajax Fake Data: ', options.data);
+      console.info(
+        '[FAKE] Request (url + sent data): ', 
+        options.url, 
+        undefined === options.data ? '[no data sent]' : options.data
+      );
 
       // isn't webservices registered and request type valid?
       if( !fakeWebServices[options.url] || !fakeWebServices[options.url][options.type] ) {
@@ -123,14 +126,29 @@
         // return the promise object according to status
         switch (data.status) {
           case 'success':
+            console.info(
+              '[FAKE] Response (received data): ', 
+              undefined === data ? '[no data received]' : data
+            );
+
             deferred.resolve( data.type.success );
             break;
 
           case 'error':
+            console.error(
+              '[FAKE] Response (received data): ', 
+              undefined === data ? '[no data received]' : data
+            );
+
             deferred.reject( data.type.error );
             break;
 
           default:
+            console.log(
+              '[FAKE] Response (received data): ', 
+              undefined === data ? '[no data received]' : data
+            );
+
             deferred.reject({});
         }
       }, options.wait);
